@@ -49,7 +49,7 @@ contract Metadata is
 
         // check if the nft can evovle based on the previously recorded MAHAX value
         uint256 oldMAHAX = old.lastRecordedMAHAX;
-        uint256 newMAHAX = 300e18;
+        uint256 newMAHAX = getMAHAXWithouDecay(nftId);
         require(_canEvolve(oldMAHAX, newMAHAX), "cant evolve");
 
         // if all good, then record the new values
