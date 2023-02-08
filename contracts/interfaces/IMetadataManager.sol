@@ -15,9 +15,26 @@ interface IMetadataManager {
     }
 
     event TraitDataSet(address who, uint256 nftId, TraitData data);
+    event NFTEvolved(
+        address who,
+        uint256 nftId,
+        uint256 oldMAHAX,
+        uint256 newMAHAX
+    );
+
+    /// @notice anyone can initialize their traits if it hasn't been set already.
+    function initTraits(uint256 nftId, TraitData memory data) external;
+
+    /// @notice special trusted contracts can update traits on behalf of a NFT
+    function setTrait(uint256 nftId, TraitData memory data) external;
+
+    /// @notice evolve the traits of a NFT. callable only by the nft owner
+    function evolve(uint256 nftId) external;
 
     function canEvolve(
         uint256 prevMAHAX,
         uint256 currentMAHAX
     ) external returns (bool);
+
+    function canNFTEvolve(uint256 nftId) external view returns (bool);
 }

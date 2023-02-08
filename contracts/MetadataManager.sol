@@ -15,14 +15,14 @@ contract Metadata is
     AccessControlEnumerable,
     VersionedInitializable
 {
-    bytes32 public TRAIT_SETTER_ROLE = keccak256("TRAIT_SETTER_ROLE");
+    bytes32 public TRAIT_SETTER_ROLE;
 
     INFTLocker public locker;
 
-    // a history of all the traits
-    mapping(uint256 => mapping(uint256 => TraitData)) public dataHistory;
+    /// @dev a history of all the traits
+    mapping(uint256 => mapping(uint256 => TraitData)) public traitHistory;
 
-    // nft id -> how much trait data has been recorded
+    /// @dev nft id -> how much trait data has been recorded
     mapping(uint256 => uint256) public historyCount;
 
     function initialize(
@@ -30,15 +30,18 @@ contract Metadata is
         address _governance
     ) external initializer {
         locker = INFTLocker(_locker);
+        TRAIT_SETTER_ROLE = keccak256("TRAIT_SETTER_ROLE");
         _setupRole(DEFAULT_ADMIN_ROLE, _governance);
     }
 
+    /// @notice anyone can initialize their traits if it hasn't been set already.
     function initTraits(uint256 nftId, TraitData memory data) external {
         require(historyCount[nftId] == 0, "traits already set");
         require(locker.ownerOf(nftId) == msg.sender, "only nft owner");
         _addData(nftId, data);
     }
 
+    /// @notice special trusted contracts can update traits on behalf of a NFT
     function setTrait(
         uint256 nftId,
         TraitData memory data
@@ -46,7 +49,10 @@ contract Metadata is
         _addData(nftId, data);
     }
 
-    function evolve(uint256 nftId) external onlyRole(TRAIT_SETTER_ROLE) {
+    /// @notice evolve the traits of a NFT. callable only by the nft owner
+    function evolve(uint256 nftId) external {
+        require(locker.ownerOf(nftId) == msg.sender, "only nft owner");
+
         TraitData memory old = _getLatestTraitData(nftId);
 
         // check if the nft can evovle based on the previously recorded MAHAX value
@@ -56,17 +62,26 @@ contract Metadata is
 
         // if all good, then record the new values
         _addData(nftId, old);
+        emit NFTEvolved(msg.sender, nftId, oldMAHAX, newMAHAX);
     }
 
     function getRevision() public pure virtual override returns (uint256) {
         return 0;
     }
 
+    /// @notice can a NFT evovle?
     function canEvolve(
         uint256 prevMAHAX,
         uint256 currentMAHAX
     ) external pure override returns (bool) {
         return _canEvolve(prevMAHAX, currentMAHAX);
+    }
+
+    function canNFTEvolve(uint256 nftId) external view override returns (bool) {
+        TraitData memory old = _getLatestTraitData(nftId);
+        uint256 oldMAHAX = old.lastRecordedMAHAX;
+        uint256 newMAHAX = getMAHAXWithouDecay(nftId);
+        return _canEvolve(oldMAHAX, newMAHAX);
     }
 
     function getLatestTraitData(
@@ -146,7 +161,7 @@ contract Metadata is
         data.lastRecordedAt = block.timestamp;
 
         // record into mapping
-        dataHistory[nftId][historyCount[nftId]] = data;
+        traitHistory[nftId][historyCount[nftId]] = data;
 
         // increment history counter
         historyCount[nftId] += 1;
@@ -158,7 +173,7 @@ contract Metadata is
     function _getLatestTraitData(
         uint256 nftId
     ) internal view returns (TraitData memory data) {
-        return dataHistory[nftId][historyCount[nftId] - 1];
+        return traitHistory[nftId][historyCount[nftId] - 1];
     }
 
     function getMAHAXWithouDecay(
