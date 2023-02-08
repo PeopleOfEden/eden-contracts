@@ -6,6 +6,8 @@ import {IERC721} from "@openzeppelin/contracts/interfaces/IERC721.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/interfaces/IERC721Receiver.sol";
 
 interface INFTLocker is IERC721 {
+    function locked(uint256) external view returns (LockedBalance memory);
+
     function balanceOfNFT(uint256) external view returns (uint256);
 
     function isStaked(uint256) external view returns (bool);
