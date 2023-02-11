@@ -1,7 +1,7 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { MetadataManager, TestLocker } from "../typechain-types";
+import { MetadataManager, MockERC20, TestLocker } from "../typechain-types";
 import { BigNumber } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
@@ -21,9 +21,12 @@ describe("MetadataManager", function () {
     const MetadataManager = await ethers.getContractFactory("MetadataManager");
     const manager: MetadataManager = await MetadataManager.deploy();
 
-    await manager.initialize(locker.address, owner.address);
+    const MockERC20 = await ethers.getContractFactory("MockERC20");
+    const maha: MockERC20 = await MockERC20.deploy("MAHA", "MAHA", 18);
 
-    return { locker, manager, owner, otherAccount };
+    await manager.initialize(maha.address, locker.address, owner.address);
+
+    return { locker, maha, manager, owner, otherAccount };
   }
 
   interface ITraitData {
@@ -158,6 +161,8 @@ describe("MetadataManager", function () {
     describe("when maha locked is less", async function () {
       this.beforeEach("lock 100 maha", async function () {
         const { manager, owner, locker } = await loadFixture(deployFixture);
+        _manager = manager;
+        _locker = locker;
 
         const d: ITraitData = {
           gender: 1,
@@ -168,11 +173,9 @@ describe("MetadataManager", function () {
         };
 
         await manager.connect(owner).initTraits(1, d);
-        _manager = manager;
 
         // increase lock amount by 100 maha
-        await locker.increaseLockAmount(e18.mul(100));
-        _locker = locker;
+        await locker.increaseAmount(1, e18.mul(100));
       });
 
       it("should update lock details", async function () {
@@ -185,7 +188,7 @@ describe("MetadataManager", function () {
       });
 
       it("should allow to evolve after locking more", async function () {
-        await _locker.increaseLockAmount(e18.mul(1000));
+        await _locker.increaseAmount(1, e18.mul(1000));
         expect(await _manager.canNFTEvolve(1)).to.equal(true);
       });
     });
@@ -193,6 +196,9 @@ describe("MetadataManager", function () {
     describe("when maha locked is enough", async function () {
       this.beforeEach("lock 400 maha", async function () {
         const { manager, owner, locker } = await loadFixture(deployFixture);
+        _manager = manager;
+        _locker = locker;
+        _owner = owner;
 
         const d: ITraitData = {
           gender: 1,
@@ -203,12 +209,9 @@ describe("MetadataManager", function () {
         };
 
         await manager.connect(owner).initTraits(1, d);
-        _manager = manager;
 
         // increase lock amount by 1000 mahax
-        await locker.increaseLockAmount(e18.mul(400));
-        _locker = locker;
-        _owner = owner;
+        await locker.increaseAmount(1, e18.mul(400));
       });
 
       it("should allow to evolve", async function () {
@@ -257,7 +260,7 @@ describe("MetadataManager", function () {
         };
 
         await manager.connect(owner).initTraits(1, d);
-        await locker.increaseLockAmount(e18.mul(1000));
+        await locker.increaseAmount(1, e18.mul(1000));
         await manager.connect(owner).evolve(1);
 
         // override history

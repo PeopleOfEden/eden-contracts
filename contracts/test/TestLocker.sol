@@ -32,7 +32,7 @@ contract TestLocker is INFTLocker {
         return address(0);
     }
 
-    function increaseLockAmount(int128 amt) external {
-        lock.amount += amt;
+    function increaseAmount(uint256, uint256 _value) external {
+        lock.amount += int128(int256(_value));
     }
 }

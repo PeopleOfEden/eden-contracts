@@ -46,4 +46,6 @@ interface IMetadataManager {
     function getChoosenHistoryIndex(uint256 i) external view returns (uint256);
 
     function isUninitialized(uint256 nftId) external view returns (bool);
+
+    function increaseLockAndEvolve(uint256 nftId, uint256 amount) external;
 }

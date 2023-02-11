@@ -8,6 +8,7 @@ import {AccessControlEnumerable} from "@openzeppelin/contracts/access/AccessCont
 import {VersionedInitializable} from "./proxy/VersionedInitializable.sol";
 import {INFTLocker} from "./interfaces/INFTLocker.sol";
 import {ITokenURIGenerator} from "./interfaces/ITokenURIGenerator.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract MetadataManager is
     ITokenURIGenerator,
@@ -19,6 +20,8 @@ contract MetadataManager is
 
     INFTLocker public locker;
 
+    IERC20 public maha;
+
     /// @dev a history of all the traits
     mapping(uint256 => mapping(uint256 => TraitData)) public traitHistory;
 
@@ -29,9 +32,11 @@ contract MetadataManager is
     mapping(uint256 => uint256) public historyOverride;
 
     function initialize(
+        address _maha,
         address _locker,
         address _governance
     ) external initializer {
+        maha = IERC20(_maha);
         locker = INFTLocker(_locker);
         TRAIT_SETTER_ROLE = keccak256("TRAIT_SETTER_ROLE");
         _setupRole(DEFAULT_ADMIN_ROLE, _governance);
@@ -53,22 +58,18 @@ contract MetadataManager is
     }
 
     /// @notice evolve the traits of a NFT. callable only by the nft owner
-    function evolve(uint256 nftId) external {
-        require(locker.ownerOf(nftId) == msg.sender, "only nft owner");
+    function evolve(uint256 nftId) external override {
+        _evolve(nftId);
+    }
 
-        TraitData memory old = _getLatestTraitData(nftId);
-
-        // check if the nft can evovle based on the previously recorded MAHAX value
-        uint256 oldMAHAX = old.lastRecordedMAHAX;
-        uint256 newMAHAX = getMAHAXWithouDecay(nftId);
-        require(_canEvolve(oldMAHAX, newMAHAX), "cant evolve");
-
-        // reset the history
-        if (historyOverride[nftId] > 0) historyOverride[nftId] = 0;
-
-        // if all good, then record the new values
-        _addData(nftId, old);
-        emit NFTEvolved(msg.sender, nftId, oldMAHAX, newMAHAX);
+    /// @notice increase lock and evolve the nft in one transaction
+    function increaseLockAndEvolve(
+        uint256 nftId,
+        uint256 amount
+    ) external override {
+        maha.transferFrom(msg.sender, address(this), amount);
+        locker.increaseAmount(nftId, amount);
+        _evolve(nftId);
     }
 
     /// @notice if a user wants to revert back to the old metadata, then they can use this fn to go back in time.
@@ -184,6 +185,24 @@ contract MetadataManager is
 
         // emit event
         emit TraitDataSet(msg.sender, nftId, data);
+    }
+
+    function _evolve(uint256 nftId) internal {
+        require(locker.ownerOf(nftId) == msg.sender, "only nft owner");
+
+        TraitData memory old = _getLatestTraitData(nftId);
+
+        // check if the nft can evovle based on the previously recorded MAHAX value
+        uint256 oldMAHAX = old.lastRecordedMAHAX;
+        uint256 newMAHAX = getMAHAXWithouDecay(nftId);
+        require(_canEvolve(oldMAHAX, newMAHAX), "cant evolve");
+
+        // reset the history
+        if (historyOverride[nftId] > 0) historyOverride[nftId] = 0;
+
+        // if all good, then record the new values
+        _addData(nftId, old);
+        emit NFTEvolved(msg.sender, nftId, oldMAHAX, newMAHAX);
     }
 
     function _getLatestTraitData(

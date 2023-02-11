@@ -7,13 +7,8 @@ import {IERC721} from "@openzeppelin/contracts/interfaces/IERC721.sol";
 interface INFTLocker {
     function locked(uint256) external view returns (LockedBalance memory);
 
-    /**
-     * @dev Returns the owner of the `tokenId` token.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     */
+    function increaseAmount(uint256 _tokenId, uint256 _value) external;
+
     function ownerOf(uint256 tokenId) external view returns (address owner);
 
     struct LockedBalance {
