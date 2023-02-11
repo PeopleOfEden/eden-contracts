@@ -5,6 +5,9 @@ pragma solidity ^0.8.9;
 // import "hardhat/console.sol";
 import {INFTLocker} from "../interfaces/INFTLocker.sol";
 
+/**
+ * A test contract that gives a lock for nft id 1
+ */
 contract TestLocker is INFTLocker {
     LockedBalance public lock;
     address public who;
@@ -27,5 +30,9 @@ contract TestLocker is INFTLocker {
     function ownerOf(uint256 id) external view returns (address owner) {
         if (id == 1) return who;
         return address(0);
+    }
+
+    function increaseLockAmount(int128 amt) external {
+        lock.amount += amt;
     }
 }

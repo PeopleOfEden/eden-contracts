@@ -68,10 +68,6 @@ contract MetadataManager is
         emit NFTEvolved(msg.sender, nftId, oldMAHAX, newMAHAX);
     }
 
-    function getRevision() public pure virtual override returns (uint256) {
-        return 0;
-    }
-
     /// @notice can a NFT evovle?
     function canEvolve(
         uint256 prevMAHAX,
@@ -91,6 +87,10 @@ contract MetadataManager is
         uint256 nftId
     ) external view returns (TraitData memory data) {
         return _getLatestTraitData(nftId);
+    }
+
+    function isUninitialized(uint256 nftId) external view returns (bool) {
+        return historyCount[nftId] == 0;
     }
 
     function _canEvolve(
@@ -175,6 +175,16 @@ contract MetadataManager is
     function _getLatestTraitData(
         uint256 nftId
     ) internal view returns (TraitData memory data) {
+        if (historyCount[nftId] == 0)
+            return
+                TraitData({
+                    gender: 0,
+                    skin: 0,
+                    dnaMetadata: 0,
+                    lastRecordedMAHAX: 0,
+                    lastRecordedAt: 0
+                });
+
         return traitHistory[nftId][historyCount[nftId] - 1];
     }
 
@@ -193,5 +203,9 @@ contract MetadataManager is
         return
             (uint128(lock.amount) * (lock.end - lock.start)) /
             (4 * 365 * 86400);
+    }
+
+    function getRevision() public pure virtual override returns (uint256) {
+        return 0;
     }
 }
