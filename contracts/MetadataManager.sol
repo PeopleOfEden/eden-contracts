@@ -140,7 +140,7 @@ contract MetadataManager is
     function _canEvolve(
         uint256 prevMAHAX,
         uint256 currentMAHAX
-    ) internal view returns (bool) {
+    ) internal pure returns (bool) {
         if (prevMAHAX > currentMAHAX) return false;
 
         // if the upper limit has been hit, then we don't do any more evolutions
