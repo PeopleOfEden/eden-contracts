@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { MetadataManager, TestLocker } from "../typechain-types";
 import { BigNumber } from "ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 describe("MetadataManager", function () {
   const e18 = BigNumber.from(10).pow(18);
@@ -75,6 +76,11 @@ describe("MetadataManager", function () {
       expect(traitDataEq(recvdData, blankTrait)).to.equal(true);
     });
 
+    it("should report no history count for id = 1", async function () {
+      const { manager } = await loadFixture(deployFixture);
+      expect(await manager.historyCount(1)).to.equal(0);
+    });
+
     it("should get blank traits for id = 2", async function () {
       const { manager } = await loadFixture(deployFixture);
       const recvdData = await manager.getLatestTraitData(2);
@@ -97,10 +103,10 @@ describe("MetadataManager", function () {
     // test
   });
 
-  describe.only("init from msg.sender tests", function () {
+  describe("init from msg.sender tests", function () {
     let _manager: MetadataManager;
 
-    beforeEach("have a init contract ", async function () {
+    beforeEach("init the traits once ", async function () {
       const { manager, owner } = await loadFixture(deployFixture);
 
       const d: ITraitData = {
@@ -112,7 +118,6 @@ describe("MetadataManager", function () {
       };
 
       await manager.connect(owner).initTraits(1, d);
-
       _manager = manager;
     });
 
@@ -146,7 +151,84 @@ describe("MetadataManager", function () {
   });
 
   describe("evolution tests", function () {
-    // test
+    let _manager: MetadataManager;
+    let _locker: TestLocker;
+    let _owner: SignerWithAddress;
+
+    describe("when maha locked is less", async function () {
+      this.beforeEach("lock 100 maha", async function () {
+        const { manager, owner, locker } = await loadFixture(deployFixture);
+
+        const d: ITraitData = {
+          gender: 1,
+          skin: 1,
+          dnaMetadata: BigNumber.from(0),
+          lastRecordedMAHAX: BigNumber.from(0),
+          lastRecordedAt: BigNumber.from(0),
+        };
+
+        await manager.connect(owner).initTraits(1, d);
+        _manager = manager;
+
+        // increase lock amount by 1000 mahax
+        await locker.increaseLockAmount(e18.mul(100));
+        _locker = locker;
+      });
+
+      it("should update lock details", async function () {
+        const lock = await _locker.locked(1);
+        expect(lock.amount).to.equal(e18.mul(1100));
+      });
+
+      it("should not allow to evolve", async function () {
+        expect(await _manager.canNFTEvolve(1)).to.equal(false);
+      });
+
+      it("should allow to evolve after locking more", async function () {
+        await _locker.increaseLockAmount(e18.mul(1000));
+        expect(await _manager.canNFTEvolve(1)).to.equal(true);
+      });
+    });
+
+    describe("when maha locked is enough", async function () {
+      this.beforeEach("lock 1000 maha", async function () {
+        const { manager, owner, locker } = await loadFixture(deployFixture);
+
+        const d: ITraitData = {
+          gender: 1,
+          skin: 1,
+          dnaMetadata: BigNumber.from(0),
+          lastRecordedMAHAX: BigNumber.from(0),
+          lastRecordedAt: BigNumber.from(0),
+        };
+
+        await manager.connect(owner).initTraits(1, d);
+        _manager = manager;
+
+        // increase lock amount by 1000 mahax
+        await locker.increaseLockAmount(e18.mul(1000));
+        _locker = locker;
+        _owner = owner;
+      });
+
+      it("should allow to evolve", async function () {
+        expect(await _manager.canNFTEvolve(1)).to.equal(true);
+      });
+
+      describe("perform a evolve", async function () {
+        this.beforeEach("evolve the nft", async function () {
+          await _manager.connect(_owner).evolve(1);
+        });
+
+        it("should now allow any more evolutions", async function () {
+          expect(await _manager.canNFTEvolve(1)).to.equal(false);
+        });
+
+        it("should add new trait data to the history", async function () {
+          expect(await _manager.historyCount(1)).to.equal(2);
+        });
+      });
+    });
   });
 
   describe("history tests", function () {

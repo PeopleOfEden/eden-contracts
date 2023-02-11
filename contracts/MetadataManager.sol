@@ -108,22 +108,22 @@ contract MetadataManager is
         if (prevMAHAX > currentMAHAX) return false;
 
         // follow a curve; a person can evolve a NFT 13 times.
-        if (prevMAHAX <= 100 && currentMAHAX >= 150) return true;
-        if (prevMAHAX <= 150 && currentMAHAX >= 250) return true;
-        if (prevMAHAX <= 250 && currentMAHAX >= 400) return true;
-        if (prevMAHAX <= 400 && currentMAHAX >= 600) return true;
-        if (prevMAHAX <= 600 && currentMAHAX >= 1000) return true;
-        if (prevMAHAX <= 1000 && currentMAHAX >= 2000) return true;
-        if (prevMAHAX <= 2000 && currentMAHAX >= 3000) return true;
-        if (prevMAHAX <= 3000 && currentMAHAX >= 4000) return true;
-        if (prevMAHAX <= 4000 && currentMAHAX >= 5000) return true;
-        if (prevMAHAX <= 5000 && currentMAHAX >= 7500) return true;
-        if (prevMAHAX <= 7500 && currentMAHAX >= 10000) return true;
-        if (prevMAHAX <= 10000 && currentMAHAX >= 12000) return true;
-        if (prevMAHAX <= 15000 && currentMAHAX >= 20000) return true;
+        if (prevMAHAX <= 100e18 && currentMAHAX >= 150e18) return true;
+        if (prevMAHAX <= 150e18 && currentMAHAX >= 250e18) return true;
+        if (prevMAHAX <= 250e18 && currentMAHAX >= 400e18) return true;
+        if (prevMAHAX <= 400e18 && currentMAHAX >= 600e18) return true;
+        if (prevMAHAX <= 600e18 && currentMAHAX >= 1000e18) return true;
+        if (prevMAHAX <= 1000e18 && currentMAHAX >= 2000e18) return true;
+        if (prevMAHAX <= 2000e18 && currentMAHAX >= 3000e18) return true;
+        if (prevMAHAX <= 3000e18 && currentMAHAX >= 4000e18) return true;
+        if (prevMAHAX <= 4000e18 && currentMAHAX >= 5000e18) return true;
+        if (prevMAHAX <= 5000e18 && currentMAHAX >= 7500e18) return true;
+        if (prevMAHAX <= 7500e18 && currentMAHAX >= 10000e18) return true;
+        if (prevMAHAX <= 10000e18 && currentMAHAX >= 12000e18) return true;
+        if (prevMAHAX <= 15000e18 && currentMAHAX >= 20000e18) return true;
 
         // beyond 25k MAHAX, the NFT is maxed out... no more evolutions
-        if (prevMAHAX <= 20000 && currentMAHAX >= 25000) return true;
+        if (prevMAHAX <= 20000e18 && currentMAHAX >= 25000e18) return true;
 
         return false;
     }
