@@ -98,8 +98,8 @@ describe("MetadataManager", function () {
       const { manager, owner } = await loadFixture(deployFixture);
 
       const d: ITraitData = {
-        gender: 0,
-        skin: 0,
+        gender: 1,
+        skin: 1,
         dnaMetadata: BigNumber.from(0),
         lastRecordedMAHAX: BigNumber.from(0),
         lastRecordedAt: BigNumber.from(0),
@@ -112,6 +112,25 @@ describe("MetadataManager", function () {
 
     it("should get initialized for id = 1", async function () {
       expect(await _manager.isUninitialized(1)).to.equal(false);
+    });
+
+    it("should report right metadata for id = 1", async function () {
+      const d = await _manager.getLatestTraitData(1);
+      expect(d.gender).to.equal(1);
+      expect(d.skin).to.equal(1);
+      expect(d.dnaMetadata).to.equal(0);
+      expect(d.lastRecordedMAHAX).to.equal(e18.mul(250));
+      expect(d.lastRecordedAt).to.be.greaterThan(0);
+    });
+
+    it("should report no history count for id = 1", async function () {
+      const d = await _manager.historyCount(1);
+      expect(d).to.equal(1);
+    });
+
+    it("should report no history overrides for id = 1", async function () {
+      const d = await _manager.historyOverride(1);
+      expect(d).to.equal(0);
     });
   });
 

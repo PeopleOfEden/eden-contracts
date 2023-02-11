@@ -85,11 +85,19 @@ contract MetadataManager is
 
     function getLatestTraitData(
         uint256 nftId
-    ) external view returns (TraitData memory data) {
+    ) external view override returns (TraitData memory) {
         return _getLatestTraitData(nftId);
     }
 
-    function isUninitialized(uint256 nftId) external view returns (bool) {
+    function getChoosenHistoryIndex(
+        uint256 nftId
+    ) external view override returns (uint256) {
+        return _getChoosenHistoryIndex(nftId);
+    }
+
+    function isUninitialized(
+        uint256 nftId
+    ) external view override returns (bool) {
         return historyCount[nftId] == 0;
     }
 
@@ -131,7 +139,7 @@ contract MetadataManager is
                     "https://staging-api.peopleofeden.com/token-uri/id-",
                     _toString(_tokenId),
                     "-history-",
-                    _toString(historyCount[_tokenId]),
+                    _toString(_getChoosenHistoryIndex(_tokenId)),
                     ".json"
                 )
             );
@@ -162,6 +170,8 @@ contract MetadataManager is
         data.lastRecordedMAHAX = getMAHAXWithouDecay(nftId);
         data.lastRecordedAt = block.timestamp;
 
+        require(_validateTraitData(data), "invalid trait data");
+
         // record into mapping
         traitHistory[nftId][historyCount[nftId]] = data;
 
@@ -188,12 +198,30 @@ contract MetadataManager is
         return traitHistory[nftId][historyCount[nftId] - 1];
     }
 
+    function _getChoosenHistoryIndex(
+        uint256 nftId
+    ) internal view returns (uint256) {
+        if (historyOverride[nftId] > 0) return historyOverride[nftId - 1];
+        if (historyCount[nftId] > 0) return historyCount[nftId] - 1;
+        return 0;
+    }
+
     function _getChoosenTraitData(
         uint256 nftId
     ) internal view returns (TraitData memory data) {
         if (historyOverride[nftId] > 0)
-            return traitHistory[nftId][historyOverride[nftId]];
-        return traitHistory[nftId][historyCount[nftId] - 1];
+            return traitHistory[nftId][historyOverride[nftId - 1]];
+        return _getLatestTraitData(nftId);
+    }
+
+    function _validateTraitData(
+        TraitData memory d
+    ) internal view returns (bool) {
+        return
+            d.gender > 0 &&
+            d.skin > 0 &&
+            d.lastRecordedMAHAX > 0 &&
+            d.lastRecordedAt >= block.timestamp;
     }
 
     function getMAHAXWithouDecay(

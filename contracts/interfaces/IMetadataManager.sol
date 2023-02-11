@@ -37,4 +37,12 @@ interface IMetadataManager {
     ) external returns (bool);
 
     function canNFTEvolve(uint256 nftId) external view returns (bool);
+
+    function getLatestTraitData(
+        uint256 i
+    ) external view returns (TraitData memory);
+
+    function getChoosenHistoryIndex(uint256 i) external view returns (uint256);
+
+    function isUninitialized(uint256 nftId) external view returns (bool);
 }
