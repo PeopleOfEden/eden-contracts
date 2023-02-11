@@ -237,6 +237,39 @@ describe("MetadataManager", function () {
         });
       });
     });
+
+    describe("test lock and evolve", async function () {
+      this.beforeEach("lock 400 maha", async function () {
+        const { manager, owner, locker, maha } = await loadFixture(
+          deployFixture
+        );
+        _manager = manager;
+        _locker = locker;
+
+        const d: ITraitData = {
+          gender: 1,
+          skin: 1,
+          dnaMetadata: BigNumber.from(0),
+          lastRecordedMAHAX: BigNumber.from(0),
+          lastRecordedAt: BigNumber.from(0),
+        };
+
+        await manager.connect(owner).initTraits(1, d);
+
+        // increase lock amount by 400 maha
+        await maha.approve(manager.address, e18.mul(400));
+        await manager.connect(owner).increaseLockAndEvolve(1, e18.mul(400));
+      });
+
+      it("should update lock", async function () {
+        const lock = await _locker.locked(1);
+        expect(lock.amount).to.equal(e18.mul(1400));
+      });
+
+      it("should not allow to evolve", async function () {
+        expect(await _manager.canNFTEvolve(1)).to.equal(false);
+      });
+    });
   });
 
   describe("history override tests", function () {
