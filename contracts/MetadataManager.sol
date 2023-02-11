@@ -63,9 +63,21 @@ contract MetadataManager is
         uint256 newMAHAX = getMAHAXWithouDecay(nftId);
         require(_canEvolve(oldMAHAX, newMAHAX), "cant evolve");
 
+        // reset the history
+        if (historyOverride[nftId] > 0) historyOverride[nftId] = 0;
+
         // if all good, then record the new values
         _addData(nftId, old);
         emit NFTEvolved(msg.sender, nftId, oldMAHAX, newMAHAX);
+    }
+
+    function overrideHistory(uint256 nftId, uint256 index) external {
+        require(locker.ownerOf(nftId) == msg.sender, "only nft owner");
+        require(index <= historyCount[nftId], "index < count");
+        require(index > 0, "index > 0");
+
+        historyOverride[nftId] = index;
+        emit NFTHistoryOverrided(msg.sender, nftId, index);
     }
 
     /// @notice can a NFT evovle?

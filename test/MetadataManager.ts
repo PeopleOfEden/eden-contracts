@@ -262,32 +262,23 @@ describe("MetadataManager", function () {
 
         await manager.connect(owner).initTraits(1, d);
         await locker.increaseLockAmount(e18.mul(1000));
-        await manager.connect(owner).evolve();
+        await manager.connect(owner).evolve(1);
 
-        await manager.over;
+        // override history
+        await manager.overrideHistory(1, 1);
       });
 
-      it("should allow to evolve", async function () {
-        expect(await _manager.canNFTEvolve(1)).to.equal(true);
+      it("should set override history", async function () {
+        expect(await _manager.historyOverride(1)).to.equal(1);
       });
 
-      describe("perform a evolve", async function () {
-        this.beforeEach("evolve the nft", async function () {
-          await _manager.connect(_owner).evolve(1);
-        });
+      it("should return old token uri", async function () {
+        const d = await _manager.tokenURI(1);
+        expect(d.endsWith("/token-uri/id-1-history-1.json")).to.equal(true);
+      });
 
-        it("should now allow any more evolutions", async function () {
-          expect(await _manager.canNFTEvolve(1)).to.equal(false);
-        });
-
-        it("should add new trait data to the history", async function () {
-          expect(await _manager.historyCount(1)).to.equal(2);
-        });
-
-        it("should report a new token uri", async function () {
-          const d = await _manager.tokenURI(1);
-          expect(d.endsWith("/token-uri/id-1-history-2.json")).to.equal(true);
-        });
+      it("should report right history count for id = 1", async function () {
+        expect(await _manager.historyCount(1)).to.equal(2);
       });
     });
   });

@@ -22,6 +22,12 @@ interface IMetadataManager {
         uint256 newMAHAX
     );
 
+    event NFTHistoryOverrided(
+        address who,
+        uint256 nftId,
+        uint256 overrideIndex
+    );
+
     /// @notice anyone can initialize their traits if it hasn't been set already.
     function initTraits(uint256 nftId, TraitData memory data) external;
 
