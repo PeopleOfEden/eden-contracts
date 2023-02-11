@@ -201,17 +201,15 @@ contract MetadataManager is
     function _getChoosenHistoryIndex(
         uint256 nftId
     ) internal view returns (uint256) {
-        if (historyOverride[nftId] > 0) return historyOverride[nftId - 1];
-        if (historyCount[nftId] > 0) return historyCount[nftId] - 1;
+        if (historyOverride[nftId] > 0) return historyOverride[nftId];
+        if (historyCount[nftId] > 0) return historyCount[nftId];
         return 0;
     }
 
     function _getChoosenTraitData(
         uint256 nftId
     ) internal view returns (TraitData memory data) {
-        if (historyOverride[nftId] > 0)
-            return traitHistory[nftId][historyOverride[nftId - 1]];
-        return _getLatestTraitData(nftId);
+        return traitHistory[nftId][_getChoosenHistoryIndex(nftId) - 1];
     }
 
     function _validateTraitData(

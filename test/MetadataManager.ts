@@ -85,6 +85,12 @@ describe("MetadataManager", function () {
       const { manager } = await loadFixture(deployFixture);
       expect(await manager.isUninitialized(1)).to.equal(true);
     });
+
+    it("should report right token uri for id = 1", async function () {
+      const { manager } = await loadFixture(deployFixture);
+      const d = await manager.tokenURI(1);
+      expect(d.endsWith("/token-uri/id-1-history-0.json")).to.equal(true);
+    });
   });
 
   describe("init from referral tests", function () {
@@ -131,6 +137,11 @@ describe("MetadataManager", function () {
     it("should report no history overrides for id = 1", async function () {
       const d = await _manager.historyOverride(1);
       expect(d).to.equal(0);
+    });
+
+    it("should report right token uri for id = 1", async function () {
+      const d = await _manager.tokenURI(1);
+      expect(d.endsWith("/token-uri/id-1-history-1.json")).to.equal(true);
     });
   });
 
