@@ -223,7 +223,7 @@ describe("MetadataManager", function () {
           await _manager.connect(_owner).evolve(1);
         });
 
-        it("should now allow any more evolutions", async function () {
+        it("should not allow any more evolutions", async function () {
           expect(await _manager.canNFTEvolve(1)).to.equal(false);
         });
 
