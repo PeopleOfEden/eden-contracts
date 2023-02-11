@@ -9,17 +9,23 @@ contract TestLocker is INFTLocker {
     LockedBalance public lock;
     address public who;
 
-    constructor(LockedBalance memory _lock) {
-        lock = _lock;
+    constructor() {
+        lock = LockedBalance({
+            amount: 1000 * 1e18,
+            end: block.timestamp + (86400 * 365), // 1 year lock
+            start: block.timestamp
+        });
+
+        who = msg.sender;
     }
 
     function locked(uint256 id) external view returns (LockedBalance memory) {
-        if (id == 0) return lock;
+        if (id == 1) return lock;
         return LockedBalance({amount: 0, end: 0, start: 0});
     }
 
     function ownerOf(uint256 id) external view returns (address owner) {
-        if (id == 0) return who;
+        if (id == 1) return who;
         return address(0);
     }
 }

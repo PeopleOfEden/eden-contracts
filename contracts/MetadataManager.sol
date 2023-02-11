@@ -9,7 +9,7 @@ import {VersionedInitializable} from "./proxy/VersionedInitializable.sol";
 import {INFTLocker} from "./interfaces/INFTLocker.sol";
 import {ITokenURIGenerator} from "./interfaces/ITokenURIGenerator.sol";
 
-contract Metadata is
+contract MetadataManager is
     ITokenURIGenerator,
     IMetadataManager,
     AccessControlEnumerable,
@@ -141,9 +141,8 @@ contract Metadata is
         // Inspired by OraclizeAPI's implementation - MIT license
         // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
 
-        if (value == 0) {
-            return "0";
-        }
+        if (value == 0) return "0";
+
         uint256 temp = value;
         uint256 digits;
         while (temp != 0) {
