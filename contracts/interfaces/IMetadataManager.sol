@@ -4,8 +4,8 @@ pragma solidity ^0.8.0;
 
 interface IMetadataManager {
     struct TraitData {
-        uint8 gender; // 0 -> male, 1 -> female
-        uint8 skin; // 0 -> fair, 1 -> brown, 2 -> dark .... etc
+        uint8 gender; // 0 -> unkown, 1 -> male, 2 -> female
+        uint8 skin; // 0 -> unkown, 1 -> fair, 2 -> brown, 3 -> dark .... etc
         uint256 dnaMetadata;
         // mahax snapshot
         uint256 lastRecordedMAHAX;

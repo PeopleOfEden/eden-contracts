@@ -25,6 +25,9 @@ contract Metadata is
     /// @dev nft id -> how much trait data has been recorded
     mapping(uint256 => uint256) public historyCount;
 
+    /// @dev nft id -> a history override
+    mapping(uint256 => uint256) public historyOverride;
+
     function initialize(
         address _locker,
         address _governance
@@ -125,7 +128,7 @@ contract Metadata is
         return
             string(
                 abi.encodePacked(
-                    "https://api.peopleofeden.com/token-uri/id-",
+                    "https://staging-api.peopleofeden.com/token-uri/id-",
                     _toString(_tokenId),
                     "-history-",
                     _toString(historyCount[_tokenId]),
@@ -173,6 +176,14 @@ contract Metadata is
     function _getLatestTraitData(
         uint256 nftId
     ) internal view returns (TraitData memory data) {
+        return traitHistory[nftId][historyCount[nftId] - 1];
+    }
+
+    function _getChoosenTraitData(
+        uint256 nftId
+    ) internal view returns (TraitData memory data) {
+        if (historyOverride[nftId] > 0)
+            return traitHistory[nftId][historyOverride[nftId]];
         return traitHistory[nftId][historyCount[nftId] - 1];
     }
 
