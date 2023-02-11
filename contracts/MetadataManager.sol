@@ -71,6 +71,7 @@ contract MetadataManager is
         emit NFTEvolved(msg.sender, nftId, oldMAHAX, newMAHAX);
     }
 
+    /// @notice if a user wants to revert back to the old metadata, then they can use this fn to go back in time.
     function overrideHistory(uint256 nftId, uint256 index) external {
         require(locker.ownerOf(nftId) == msg.sender, "only nft owner");
         require(index <= historyCount[nftId], "index < count");
@@ -78,14 +79,6 @@ contract MetadataManager is
 
         historyOverride[nftId] = index;
         emit NFTHistoryOverrided(msg.sender, nftId, index);
-    }
-
-    /// @notice can a NFT evovle?
-    function canEvolve(
-        uint256 prevMAHAX,
-        uint256 currentMAHAX
-    ) external pure override returns (bool) {
-        return _canEvolve(prevMAHAX, currentMAHAX);
     }
 
     function canNFTEvolve(uint256 nftId) external view override returns (bool) {
@@ -146,28 +139,14 @@ contract MetadataManager is
     function _canEvolve(
         uint256 prevMAHAX,
         uint256 currentMAHAX
-    ) internal pure returns (bool) {
+    ) internal view returns (bool) {
         if (prevMAHAX > currentMAHAX) return false;
 
-        // follow a curve; a person can evolve a NFT 13 times.
-        if (prevMAHAX <= 100e18 && currentMAHAX >= 150e18) return true;
-        if (prevMAHAX <= 150e18 && currentMAHAX >= 250e18) return true;
-        if (prevMAHAX <= 250e18 && currentMAHAX >= 400e18) return true;
-        if (prevMAHAX <= 400e18 && currentMAHAX >= 600e18) return true;
-        if (prevMAHAX <= 600e18 && currentMAHAX >= 1000e18) return true;
-        if (prevMAHAX <= 1000e18 && currentMAHAX >= 2000e18) return true;
-        if (prevMAHAX <= 2000e18 && currentMAHAX >= 3000e18) return true;
-        if (prevMAHAX <= 3000e18 && currentMAHAX >= 4000e18) return true;
-        if (prevMAHAX <= 4000e18 && currentMAHAX >= 5000e18) return true;
-        if (prevMAHAX <= 5000e18 && currentMAHAX >= 7500e18) return true;
-        if (prevMAHAX <= 7500e18 && currentMAHAX >= 10000e18) return true;
-        if (prevMAHAX <= 10000e18 && currentMAHAX >= 12000e18) return true;
-        if (prevMAHAX <= 15000e18 && currentMAHAX >= 20000e18) return true;
+        // if the upper limit has been hit, then we don't do any more evolutions
+        if (prevMAHAX > 25000e18) return false;
 
-        // beyond 25k MAHAX, the NFT is maxed out... no more evolutions
-        if (prevMAHAX <= 20000e18 && currentMAHAX >= 25000e18) return true;
-
-        return false;
+        // if the different between the prev and current is 100 mahax, then we evolve the nft
+        return currentMAHAX - prevMAHAX >= 100e18;
     }
 
     function _toString(uint256 value) internal pure returns (string memory) {

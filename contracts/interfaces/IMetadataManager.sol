@@ -37,11 +37,6 @@ interface IMetadataManager {
     /// @notice evolve the traits of a NFT. callable only by the nft owner
     function evolve(uint256 nftId) external;
 
-    function canEvolve(
-        uint256 prevMAHAX,
-        uint256 currentMAHAX
-    ) external returns (bool);
-
     function canNFTEvolve(uint256 nftId) external view returns (bool);
 
     function getLatestTraitData(

@@ -170,7 +170,7 @@ describe("MetadataManager", function () {
         await manager.connect(owner).initTraits(1, d);
         _manager = manager;
 
-        // increase lock amount by 1000 mahax
+        // increase lock amount by 100 maha
         await locker.increaseLockAmount(e18.mul(100));
         _locker = locker;
       });
@@ -191,7 +191,7 @@ describe("MetadataManager", function () {
     });
 
     describe("when maha locked is enough", async function () {
-      this.beforeEach("lock 1000 maha", async function () {
+      this.beforeEach("lock 400 maha", async function () {
         const { manager, owner, locker } = await loadFixture(deployFixture);
 
         const d: ITraitData = {
@@ -206,7 +206,7 @@ describe("MetadataManager", function () {
         _manager = manager;
 
         // increase lock amount by 1000 mahax
-        await locker.increaseLockAmount(e18.mul(1000));
+        await locker.increaseLockAmount(e18.mul(400));
         _locker = locker;
         _owner = owner;
       });
