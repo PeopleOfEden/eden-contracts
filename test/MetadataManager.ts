@@ -227,15 +227,68 @@ describe("MetadataManager", function () {
         it("should add new trait data to the history", async function () {
           expect(await _manager.historyCount(1)).to.equal(2);
         });
+
+        it("should report a new token uri", async function () {
+          const d = await _manager.tokenURI(1);
+          expect(d.endsWith("/token-uri/id-1-history-2.json")).to.equal(true);
+        });
       });
     });
   });
 
-  describe("history tests", function () {
-    // test
-  });
+  // describe("history tests", function () {
+  //   // test
+  // });
 
   describe("history override tests", function () {
-    // test
+    let _manager: MetadataManager;
+    let _locker: TestLocker;
+    let _owner: SignerWithAddress;
+
+    describe("when maha is locked and we evolve once", async function () {
+      this.beforeEach("lock 1000 maha and evolve", async function () {
+        const { manager, owner, locker } = await loadFixture(deployFixture);
+        _manager = manager;
+        _locker = locker;
+        _owner = owner;
+
+        const d: ITraitData = {
+          gender: 1,
+          skin: 1,
+          dnaMetadata: BigNumber.from(0),
+          lastRecordedMAHAX: BigNumber.from(0),
+          lastRecordedAt: BigNumber.from(0),
+        };
+
+        await manager.connect(owner).initTraits(1, d);
+        await locker.increaseLockAmount(e18.mul(1000));
+        await manager.connect(owner).evolve();
+
+        await manager.over;
+      });
+
+      it("should allow to evolve", async function () {
+        expect(await _manager.canNFTEvolve(1)).to.equal(true);
+      });
+
+      describe("perform a evolve", async function () {
+        this.beforeEach("evolve the nft", async function () {
+          await _manager.connect(_owner).evolve(1);
+        });
+
+        it("should now allow any more evolutions", async function () {
+          expect(await _manager.canNFTEvolve(1)).to.equal(false);
+        });
+
+        it("should add new trait data to the history", async function () {
+          expect(await _manager.historyCount(1)).to.equal(2);
+        });
+
+        it("should report a new token uri", async function () {
+          const d = await _manager.tokenURI(1);
+          expect(d.endsWith("/token-uri/id-1-history-2.json")).to.equal(true);
+        });
+      });
+    });
   });
 });
