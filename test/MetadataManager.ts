@@ -236,10 +236,6 @@ describe("MetadataManager", function () {
     });
   });
 
-  // describe("history tests", function () {
-  //   // test
-  // });
-
   describe("history override tests", function () {
     let _manager: MetadataManager;
     let _locker: TestLocker;

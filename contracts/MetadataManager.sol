@@ -113,6 +113,36 @@ contract MetadataManager is
         return historyCount[nftId] == 0;
     }
 
+    /// @dev Returns current token URI metadata
+    /// @param _tokenId Token ID to fetch URI for.
+    function tokenURI(
+        uint256 _tokenId
+    ) external view override returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    "https://staging-api.peopleofeden.com/token-uri/id-",
+                    _toString(_tokenId),
+                    "-history-",
+                    _toString(_getChoosenHistoryIndex(_tokenId)),
+                    ".json"
+                )
+            );
+    }
+
+    function getMAHAXWithouDecay(
+        uint256 nftId
+    ) public view returns (uint256 mahax) {
+        INFTLocker.LockedBalance memory lock = locker.locked(nftId);
+        return
+            (uint128(lock.amount) * (lock.end - lock.start)) /
+            (4 * 365 * 86400);
+    }
+
+    function getRevision() public pure virtual override returns (uint256) {
+        return 0;
+    }
+
     function _canEvolve(
         uint256 prevMAHAX,
         uint256 currentMAHAX
@@ -138,23 +168,6 @@ contract MetadataManager is
         if (prevMAHAX <= 20000e18 && currentMAHAX >= 25000e18) return true;
 
         return false;
-    }
-
-    /// @dev Returns current token URI metadata
-    /// @param _tokenId Token ID to fetch URI for.
-    function tokenURI(
-        uint256 _tokenId
-    ) external view override returns (string memory) {
-        return
-            string(
-                abi.encodePacked(
-                    "https://staging-api.peopleofeden.com/token-uri/id-",
-                    _toString(_tokenId),
-                    "-history-",
-                    _toString(_getChoosenHistoryIndex(_tokenId)),
-                    ".json"
-                )
-            );
     }
 
     function _toString(uint256 value) internal pure returns (string memory) {
@@ -232,18 +245,5 @@ contract MetadataManager is
             d.skin > 0 &&
             d.lastRecordedMAHAX > 0 &&
             d.lastRecordedAt >= block.timestamp;
-    }
-
-    function getMAHAXWithouDecay(
-        uint256 nftId
-    ) public view returns (uint256 mahax) {
-        INFTLocker.LockedBalance memory lock = locker.locked(nftId);
-        return
-            (uint128(lock.amount) * (lock.end - lock.start)) /
-            (4 * 365 * 86400);
-    }
-
-    function getRevision() public pure virtual override returns (uint256) {
-        return 0;
     }
 }
