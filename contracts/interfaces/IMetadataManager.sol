@@ -43,6 +43,10 @@ interface IMetadataManager {
         uint256 i
     ) external view returns (TraitData memory);
 
+    function getChoosenTraitData(
+        uint256 nftId
+    ) external view returns (uint256 index, TraitData memory);
+
     function getChoosenHistoryIndex(uint256 i) external view returns (uint256);
 
     function isUninitialized(uint256 nftId) external view returns (bool);

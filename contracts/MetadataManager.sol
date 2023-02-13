@@ -101,6 +101,13 @@ contract MetadataManager is
         return _getChoosenHistoryIndex(nftId);
     }
 
+    function getChoosenTraitData(
+        uint256 nftId
+    ) external view override returns (uint256, TraitData memory) {
+        uint256 index = _getChoosenHistoryIndex(nftId);
+        return (index, traitHistory[nftId][index]);
+    }
+
     function isUninitialized(
         uint256 nftId
     ) external view override returns (bool) {
