@@ -95,6 +95,13 @@ describe("MetadataManager", function () {
       expect(await manager.isUninitialized(1)).to.equal(true);
     });
 
+    it("should report right choosen data for id = 1", async function () {
+      const { manager } = await loadFixture(deployFixture);
+      const [index, recvdData] = await manager.getChoosenTraitData(1);
+      expect(index.toNumber()).to.equal(0);
+      expect(traitDataEq(recvdData, blankTrait)).to.equal(true);
+    });
+
     it("should report right token uri for id = 1", async function () {
       const { manager } = await loadFixture(deployFixture);
       const d = await manager.tokenURI(1);
@@ -137,7 +144,7 @@ describe("MetadataManager", function () {
       expect(d.lastRecordedAt).to.be.greaterThan(0);
     });
 
-    it("should report no history count for id = 1", async function () {
+    it("should report one history count for id = 1", async function () {
       const d = await _manager.historyCount(1);
       expect(d).to.equal(1);
     });
@@ -145,6 +152,21 @@ describe("MetadataManager", function () {
     it("should report no history overrides for id = 1", async function () {
       const d = await _manager.historyOverride(1);
       expect(d).to.equal(0);
+    });
+
+    it("should report right getChoosenHistoryIndex for id = 1", async function () {
+      const d = await _manager.getChoosenHistoryIndex(1);
+      expect(d).to.equal(1);
+    });
+
+    it("should report right choosen data for id = 1", async function () {
+      const [index, d] = await _manager.getChoosenTraitData(1);
+      expect(index.toNumber()).to.equal(1);
+      expect(d.gender).to.equal(1);
+      expect(d.skin).to.equal(1);
+      expect(d.dnaMetadata).to.equal(0);
+      expect(d.lastRecordedMAHAX).to.equal(e18.mul(250));
+      expect(d.lastRecordedAt).to.be.greaterThan(0);
     });
 
     it("should report right token uri for id = 1", async function () {

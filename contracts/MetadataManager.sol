@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 // Uncomment this line to use console.log
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 import {IMetadataManager} from "./interfaces/IMetadataManager.sol";
 import {AccessControlEnumerable} from "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import {VersionedInitializable} from "./proxy/VersionedInitializable.sol";
@@ -22,13 +22,13 @@ contract MetadataManager is
 
     IERC20 public maha;
 
-    /// @dev a history of all the traits
+    /// @dev history of all the traits
     mapping(uint256 => mapping(uint256 => TraitData)) public traitHistory;
 
-    /// @dev nft id -> how much trait data has been recorded
+    /// @dev nft id -> how much trait data has been recorded. 0 = there is no history
     mapping(uint256 => uint256) public historyCount;
 
-    /// @dev nft id -> a history override
+    /// @dev nft id -> history override. 0 = there is no override.
     mapping(uint256 => uint256) public historyOverride;
 
     function initialize(
@@ -98,6 +98,7 @@ contract MetadataManager is
     function getChoosenHistoryIndex(
         uint256 nftId
     ) external view override returns (uint256) {
+        console.log("fuck", _getChoosenHistoryIndex(nftId));
         return _getChoosenHistoryIndex(nftId);
     }
 
@@ -105,6 +106,7 @@ contract MetadataManager is
         uint256 nftId
     ) external view override returns (uint256, TraitData memory) {
         uint256 index = _getChoosenHistoryIndex(nftId);
+        console.log("hit", index);
         return (index, traitHistory[nftId][index]);
     }
 
@@ -184,11 +186,11 @@ contract MetadataManager is
 
         require(_validateTraitData(data), "invalid trait data");
 
-        // record into mapping
-        traitHistory[nftId][historyCount[nftId]] = data;
-
         // increment history counter
         historyCount[nftId] += 1;
+
+        // record into mapping
+        traitHistory[nftId][historyCount[nftId]] = data;
 
         // emit event
         emit TraitDataSet(msg.sender, nftId, data);
@@ -204,7 +206,7 @@ contract MetadataManager is
         uint256 newMAHAX = getMAHAXWithouDecay(nftId);
         require(_canEvolve(oldMAHAX, newMAHAX), "cant evolve");
 
-        // reset the history
+        // reset the history override
         if (historyOverride[nftId] > 0) historyOverride[nftId] = 0;
 
         // if all good, then record the new values
@@ -225,7 +227,7 @@ contract MetadataManager is
                     lastRecordedAt: 0
                 });
 
-        return traitHistory[nftId][historyCount[nftId] - 1];
+        return traitHistory[nftId][historyCount[nftId]];
     }
 
     function _getChoosenHistoryIndex(
@@ -239,7 +241,7 @@ contract MetadataManager is
     function _getChoosenTraitData(
         uint256 nftId
     ) internal view returns (TraitData memory data) {
-        return traitHistory[nftId][_getChoosenHistoryIndex(nftId) - 1];
+        return traitHistory[nftId][_getChoosenHistoryIndex(nftId)];
     }
 
     function _validateTraitData(
