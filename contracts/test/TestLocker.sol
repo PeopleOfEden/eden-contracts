@@ -8,7 +8,7 @@ import {INFTLocker} from "../interfaces/INFTLocker.sol";
 /**
  * A test contract that gives a lock for nft id 1
  */
-contract TestLocker is INFTLocker {
+abstract contract TestLocker is INFTLocker {
     LockedBalance public lock;
     address public who;
 

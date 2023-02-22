@@ -1,18 +1,17 @@
-import { ethers } from "hardhat";
+import { deployOrLoadAndVerify } from "./utils";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const maha = "0x90344dD6Dc73A6FDa00A9e8315065662cFf43228";
+  const locker = "0x9ee8110c0aACb7f9147252d7A2D95a5ff52F8496";
+  const governance = "0x547283f06b4479fa8bf641caa2ddc7276d4899bf";
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  const manager = await deployOrLoadAndVerify(
+    "MetadataManager",
+    "MetadataManager",
+    []
+  );
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
-
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+  await manager.initialize(maha, locker, governance);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
