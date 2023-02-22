@@ -58,7 +58,15 @@ contract MetadataManager is
     }
 
     /// @notice evolve the traits of a NFT. callable only by the nft owner
+    function evolveFor(
+        uint256 nftId
+    ) external override onlyRole(TRAIT_SETTER_ROLE) {
+        _evolve(nftId);
+    }
+
+    /// @notice evolve the traits of a NFT. callable only by the nft owner
     function evolve(uint256 nftId) external override {
+        require(locker.ownerOf(nftId) == msg.sender, "only nft owner");
         _evolve(nftId);
     }
 
@@ -67,8 +75,11 @@ contract MetadataManager is
         uint256 nftId,
         uint256 amount
     ) external override {
+        require(locker.ownerOf(nftId) == msg.sender, "only nft owner");
+
         maha.transferFrom(msg.sender, address(this), amount);
         locker.increaseAmount(nftId, amount);
+
         _evolve(nftId);
     }
 
@@ -98,7 +109,6 @@ contract MetadataManager is
     function getChoosenHistoryIndex(
         uint256 nftId
     ) external view override returns (uint256) {
-        console.log("fuck", _getChoosenHistoryIndex(nftId));
         return _getChoosenHistoryIndex(nftId);
     }
 
@@ -106,7 +116,6 @@ contract MetadataManager is
         uint256 nftId
     ) external view override returns (uint256, TraitData memory) {
         uint256 index = _getChoosenHistoryIndex(nftId);
-        console.log("hit", index);
         return (index, traitHistory[nftId][index]);
     }
 
@@ -197,8 +206,6 @@ contract MetadataManager is
     }
 
     function _evolve(uint256 nftId) internal {
-        require(locker.ownerOf(nftId) == msg.sender, "only nft owner");
-
         TraitData memory old = _getLatestTraitData(nftId);
 
         // check if the nft can evovle based on the previously recorded MAHAX value

@@ -114,7 +114,6 @@ contract ETHMahaXLocker {
         }
     }
 
-    // convert the eth from sales into maha nfts
     function swapETHforLocks(
         uint256 ethInMax,
         uint256 count,
@@ -135,8 +134,7 @@ contract ETHMahaXLocker {
         }
     }
 
-    // convert the eth from sales into maha nfts
-    function swapETHforLockWithMetadata(
+    function createLockWithMetadataWithETH(
         uint256 ethInMax,
         uint256 amount,
         bool unwrapWETH,
@@ -155,5 +153,28 @@ contract ETHMahaXLocker {
 
         // set metadata
         metadataManager.setTrait(id, data);
+    }
+
+    function increaseAndEvolve(uint256 id, uint256 amount) public {
+        // take maha
+        maha.transferFrom(msg.sender, address(this), amount);
+
+        // increase lock and evolve
+        locker.increaseAmount(id, amount);
+        metadataManager.evolveFor(id);
+    }
+
+    function increaseAndEvolveWithETH(
+        uint256 id,
+        uint256 ethInMax,
+        uint256 amount,
+        bool unwrapWETH
+    ) public payable {
+        // weth -> maha
+        swapETHforMAHA(amount, ethInMax, me, unwrapWETH);
+
+        // increase lock and evolve
+        locker.increaseAmount(id, amount);
+        metadataManager.evolveFor(id);
     }
 }

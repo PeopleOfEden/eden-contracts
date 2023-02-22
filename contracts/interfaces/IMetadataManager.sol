@@ -52,4 +52,6 @@ interface IMetadataManager {
     function isUninitialized(uint256 nftId) external view returns (bool);
 
     function increaseLockAndEvolve(uint256 nftId, uint256 amount) external;
+
+    function evolveFor(uint256 nftId) external;
 }
