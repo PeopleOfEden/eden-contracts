@@ -1,8 +1,8 @@
-import { deployOrLoadAndVerify } from "./utils";
+import { deployOrLoadAndVerify, getOutputAddress } from "../utils";
 
 async function main() {
-  const maha = "0x90344dD6Dc73A6FDa00A9e8315065662cFf43228";
-  const locker = "0x9ee8110c0aACb7f9147252d7A2D95a5ff52F8496";
+  const maha = await getOutputAddress("MAHA");
+  const locker = await getOutputAddress("MAHAXLocker");
   const governance = "0x547283f06b4479fa8bf641caa2ddc7276d4899bf";
 
   const manager = await deployOrLoadAndVerify(

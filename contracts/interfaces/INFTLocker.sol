@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import {IERC721} from "@openzeppelin/contracts/interfaces/IERC721.sol";
 
-interface INFTLocker is IERC721 {
+interface INFTLocker {
     function createLockFor(
         uint256 _value,
         uint256 _lockDuration,
@@ -17,6 +17,8 @@ interface INFTLocker is IERC721 {
     function locked(
         uint256 _nftId
     ) external view returns (LockedBalance memory);
+
+    function ownerOf(uint256 _nftId) external view returns (address);
 
     enum DepositType {
         DEPOSIT_FOR_TYPE,

@@ -1,0 +1,27 @@
+{
+  "MAHA": {
+    "abi": "MockERC20",
+    "verified": true,
+    "address": "0x90344dD6Dc73A6FDa00A9e8315065662cFf43228"
+  },
+  "MAHAXLocker": {
+    "abi": "MAHAXLocker",
+    "verified": true,
+    "address": "0xD2125a722d28C7685AEd658A3Ddc7b08275b8Aeb"
+  },
+  "WETH": {
+    "abi": "IERC20",
+    "verified": true,
+    "address": "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
+  },
+  "MetadataManager": {
+    "abi": "MetadataManager",
+    "verified": true,
+    "address": "0x21eA7cd5F7f8eC2390B49DBabD998FaEC9F7503a"
+  },
+  "ETHMahaXLocker": {
+    "abi": "ETHMahaXLocker",
+    "verified": true,
+    "address": "0x5441695f4445E40900b4c4B0Fb3eD2B9E51601A6"
+  }
+}

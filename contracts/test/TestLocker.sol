@@ -8,7 +8,7 @@ import {INFTLocker} from "../interfaces/INFTLocker.sol";
 /**
  * A test contract that gives a lock for nft id 1
  */
-abstract contract TestLocker is INFTLocker {
+contract TestLocker is INFTLocker {
     LockedBalance public lock;
     address public who;
 
@@ -22,17 +22,31 @@ abstract contract TestLocker is INFTLocker {
         who = msg.sender;
     }
 
-    function locked(uint256 id) external view returns (LockedBalance memory) {
+    function locked(
+        uint256 id
+    ) external view override returns (LockedBalance memory) {
         if (id == 1) return lock;
         return LockedBalance({amount: 0, end: 0, start: 0});
     }
 
-    function ownerOf(uint256 id) external view returns (address owner) {
+    function ownerOf(
+        uint256 id
+    ) external view override returns (address owner) {
         if (id == 1) return who;
         return address(0);
     }
 
     function increaseAmount(uint256, uint256 _value) external {
         lock.amount += int128(int256(_value));
+    }
+
+    function createLockFor(
+        uint256,
+        uint256,
+        address,
+        bool
+    ) external pure override returns (uint256) {
+        // todo
+        return 1;
     }
 }

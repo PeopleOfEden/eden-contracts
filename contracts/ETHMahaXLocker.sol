@@ -5,11 +5,12 @@ import {INFTLocker} from "./interfaces/INFTLocker.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IWETH9} from "./interfaces/IWETH9.sol";
 import {IMetadataManager} from "./interfaces/IMetadataManager.sol";
+import {VersionedInitializable} from "./proxy/VersionedInitializable.sol";
 
 import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-contract ETHMahaXLocker {
+contract ETHMahaXLocker is VersionedInitializable {
     INFTLocker public locker;
     ISwapRouter public router;
     IERC20 public maha;
@@ -18,13 +19,13 @@ contract ETHMahaXLocker {
 
     address private me;
 
-    constructor(
+    function initialize(
         address _locker,
         address _maha,
         address _weth,
         address _router,
         address _metadataManager
-    ) {
+    ) external initializer {
         locker = INFTLocker(_locker);
         maha = IERC20(_maha);
         weth9 = IWETH9(_weth);
@@ -39,8 +40,8 @@ contract ETHMahaXLocker {
         me = address(this);
     }
 
-    receive() external payable {
-        // nothing
+    function getRevision() public pure virtual override returns (uint256) {
+        return 0;
     }
 
     // convert maha into NFTs
