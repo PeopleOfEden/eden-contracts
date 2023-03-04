@@ -19,9 +19,9 @@
     "verified": true,
     "address": "0x21eA7cd5F7f8eC2390B49DBabD998FaEC9F7503a"
   },
-  "ETHMahaXLocker": {
+  "ETHMahaXLockerV2": {
     "abi": "ETHMahaXLocker",
     "verified": true,
-    "address": "0x5441695f4445E40900b4c4B0Fb3eD2B9E51601A6"
+    "address": "0xC6c1b7a1FC95cF879d98161798bA154E6cA3B260"
   }
 }

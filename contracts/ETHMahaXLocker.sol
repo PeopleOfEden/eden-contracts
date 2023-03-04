@@ -40,6 +40,10 @@ contract ETHMahaXLocker is VersionedInitializable {
         me = address(this);
     }
 
+    receive() external payable {
+        // do nothing
+    }
+
     function getRevision() public pure virtual override returns (uint256) {
         return 0;
     }
