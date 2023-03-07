@@ -68,7 +68,7 @@ const config: HardhatUserConfig & any = {
   networks: {
     hardhat: {
       forking: {
-        url: `https://polygon-mainnet.g.alchemy.com/v2/U8XSc2K4sX3Ct0LzdQW2mStjcI3z-XaS`,
+        url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
         // blockNumber: 16334756,
       },
       accounts: [

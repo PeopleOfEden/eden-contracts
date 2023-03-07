@@ -6,24 +6,28 @@ async function main() {
   const locker = await getOutputAddress("MAHAXLocker");
   const weth = await getOutputAddress("WETH");
   const metadataManager = await getOutputAddress("MetadataManager");
-  const governance = "0x547283f06b4479fa8bf641caa2ddc7276d4899bf";
+  const gaugeProxyAdmin = "0x6357EDbfE5aDA570005ceB8FAd3139eF5A8863CC";
 
-  const deploy = await deployOrLoadAndVerify(
-    "ETHMahaXLockerV2",
+  const implementation = await deployOrLoadAndVerify(
+    `ETHMahaXLockerImpl`,
     "ETHMahaXLocker",
     []
   );
 
-  const instance = await ethers.getContractAt("ETHMahaXLocker", deploy.address);
-
-  console.log("initalize");
-  await instance.initialize(
+  const ETHMahaXLocker = await ethers.getContractFactory("ETHMahaXLocker");
+  const initData = ETHMahaXLocker.interface.encodeFunctionData("initialize", [
     locker, // address _locker,
     maha, // address _maha,
     weth, // address _weth,
     "0xE592427A0AEce92De3Edee1F18E0157C05861564", // address _router,
-    metadataManager // address _metadataManager
-  );
+    metadataManager, // address _metadataManager
+  ]);
+
+  await deployOrLoadAndVerify("ETHMahaXLocker", "TransparentUpgradeableProxy", [
+    implementation.address,
+    gaugeProxyAdmin,
+    initData,
+  ]);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -1,0 +1,47 @@
+{
+  "ARTH": {
+    "abi": "IERC20",
+    "address": "0x8cc0f052fff7ead7f2edcccac895502e884a8a71"
+  },
+  "USDC": {
+    "abi": "IERC20",
+    "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+  },
+  "SCLP": {
+    "abi": "IERC20",
+    "address": "0x3f6d1649a1366b0e82173d33e365953f9f1cc84c"
+  },
+  "MAHA": {
+    "abi": "IERC20",
+    "address": "0x745407c86df8db893011912d3ab28e68b62e49b0"
+  },
+  "WETH": {
+    "abi": "IWETH",
+    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+  },
+  "MAHAXLocker": {
+    "abi": "MAHAXLocker",
+    "verified": true,
+    "address": "0xbdD8F4dAF71C2cB16ccE7e54BB81ef3cfcF5AAcb"
+  },
+  "MetadataManagerImpl": {
+    "abi": "MetadataManager",
+    "verified": true,
+    "address": "0xFaa208daE7c26E0f4FF8A42388091C76340faCd8"
+  },
+  "MetadataManager": {
+    "abi": "TransparentUpgradeableProxy",
+    "verified": true,
+    "address": "0xf44D766229790EC8D1458981EaA9dCfF72834aAb"
+  },
+  "ETHMahaXLockerImpl": {
+    "abi": "ETHMahaXLocker",
+    "verified": true,
+    "address": "0x3AfF1306c9988a84fE8681490fa027a0668B1c05"
+  },
+  "ETHMahaXLocker": {
+    "abi": "TransparentUpgradeableProxy",
+    "verified": false,
+    "address": "0x391929522fEd6ed633e6C432D030A381f8f85630"
+  }
+}
